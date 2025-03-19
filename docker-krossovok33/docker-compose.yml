@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  kross33-nginx:
+    image: nginx:1.21
+    volumes:
+      - ../:/app
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - kross33-php
+
+  kross33-php:
+    build: ./php
+    working_dir: /app
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    volumes:
+      - ../:/app
+      - ./php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+  kross33-postgres:
+    image: postgres:14.8-alpine3.18
+    environment:
+      POSTGRES_DB: "kross33"
+      POSTGRES_USER: "kross33"
+      POSTGRES_PASSWORD: "1111"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - kross33-postgres:/var/lib/postgresql/data
+
+volumes:
+  kross33-postgres:
